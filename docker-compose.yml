@@ -1,0 +1,50 @@
+version: '3'
+
+networks:
+  backend:
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "${NGINX_PORT}:80"
+    volumes:
+      - ./app:/var/www
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - ./config/nginx/logs:/var/log/nginx/
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: unless-stopped
+    volumes:
+      - ./config/mysql/data:/var/lib/mysql
+      - ./config/mysql/conf.d:/etc/mysql/conf.d
+      - ./config/mysql/logs:/var/log/mysql/
+      - ./config/mysql/dump:/dump
+    ports:
+      - "${MYSQL_PORT}:3306"
+    env_file:
+      - .env
+    networks:
+      - backend
+
+  php:
+    build:
+      context: config/php
+      dockerfile: Dockerfile
+      args:
+        PHP_VERSION: "${PHP_VERSION}"
+    container_name: php
+    volumes:
+      - ./app:/var/www
+    ports:
+      - "${PHP_PORT}:9000"
+    networks:
+      - backend

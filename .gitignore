@@ -1,0 +1,11 @@
+.env
+/config/mysql/data/**
+/config/mysql/dump/**
+/config/mysql/logs/**
+/config/nginx/logs/**
+
+# Файлы web-проектов
+!/app/.gitkeep
+
+# Другие файлы
+.idea/
